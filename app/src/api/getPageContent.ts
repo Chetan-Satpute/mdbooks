@@ -6,13 +6,31 @@ const mdxString = `
 
 This is some *mdx* markdown text
 
-<Canvas draw={async (canvas, ctx) => {
+<Canvas height={500} width={5000} draw={async (ctx) => {
 
-  canvas.width = 5000;
-  canvas.height = 500;
+  ctx.beginPath();
 
-  ctx.moveTo(250, 250);
-  ctx.arc(250, 250, 200, 0, 2 * Math.PI);
+  ctx.arc(250, 250, 20, 0, 2 * Math.PI);
+
+  ctx.closePath();
+
+  ctx.stroke();
+
+}} />
+
+This is some <u>mdx</u> markdown text
+
+<Canvas height={400} width={500} draw={async (ctx) => {
+
+  ctx.beginPath();
+
+  ctx.moveTo(100, 100);
+  ctx.lineTo(200, 100);
+  ctx.lineTo(200, 200);
+  ctx.lineTo(100, 200);
+  ctx.lineTo(100, 100);
+
+  ctx.closePath();
 
   ctx.stroke();
 
