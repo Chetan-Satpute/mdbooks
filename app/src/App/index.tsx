@@ -1,10 +1,10 @@
 import React, { FC } from "react";
-import Page from "../components/Page";
+import Book from "../components/Book";
 
 const App: FC = () => {
   return (
     <div className="h-screen w-screen">
-      <Page />
+      <Book />
     </div>
   );
 };
