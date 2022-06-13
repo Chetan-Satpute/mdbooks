@@ -1,65 +1,108 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useRef, useLayoutEffect, useState } from "react";
+import { getPinchDist } from "./utils";
 
-import "./index.css";
-
-type DrawFunction = (cxt: CanvasRenderingContext2D) => Promise<void>;
+export type DrawFunction = (cxt: CanvasRenderingContext2D) => void;
+export type Pair = { x: number; y: number };
 
 interface IProps {
-  height: number;
-  width: number;
   draw: DrawFunction;
 }
 
-const Canvas: FC<IProps> = ({ draw, height, width }) => {
+const Canvas: FC<IProps> = ({ draw }) => {
+  const containerRef = useRef<HTMLDivElement>();
   const canvasRef = useRef<HTMLCanvasElement>();
 
-  const render = async () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+  const [scale, setScale] = useState<Pair>({ x: 1, y: 1 });
+  const [pinchDist, setPinchDist] = useState<number>(0);
 
+  const [dragStart, setDragStart] = useState<Pair>();
+  const [translate, setTranslate] = useState<[Pair, Pair]>([
+    { x: 0, y: 0 }, // current
+    { x: 0, y: 0 }, // previous
+  ]);
+
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+
+    canvas.height = containerRect.height;
+    canvas.width = containerRect.width;
+  }, []);
+
+  const render = async () => {
     // wait for next animation frame
     await new Promise((resolve) => window.requestAnimationFrame(resolve));
 
-    // clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = "#c9d1d9";
-
-    await draw(ctx);
-  };
-
-  const handleResize: React.ChangeEventHandler<HTMLInputElement> = async (
-    event
-  ) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    const value = Number(event.target.value);
+    // Setup Canvas
+    ctx.setTransform(scale.x, 0, 0, scale.y, translate[0].x, translate[0].y);
+    ctx.clearRect(-1000, -1000, canvas.width + 1000, canvas.height + 1000);
 
-    canvas.height = height * value;
-    canvas.width = width * value;
+    // default styles
+    ctx.strokeStyle = "#c9d1d9";
+    ctx.lineWidth = 2;
 
-    ctx.scale(value, value);
-
-    await render();
+    // Draw
+    draw(ctx);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     render();
-  }, [draw]);
+  }, [translate, scale]);
+
+  const onMove = (x: number, y: number) => {
+    if (dragStart !== undefined) {
+      setTranslate([
+        {
+          x: translate[1].x + (x - dragStart.x),
+          y: translate[1].y + (y - dragStart.y),
+        },
+        translate[1],
+      ]);
+    }
+  };
+
+  const onUp = () => {
+    setDragStart(undefined);
+    setTranslate([translate[0], translate[0]]);
+  };
+
+  const onZoom = (zoomIn: boolean) => {
+    const { x, y } = scale;
+
+    const delta = 0.01 * (zoomIn ? 1 : -1);
+
+    setScale({ x: x + delta, y: y + delta });
+  };
 
   return (
-    <div className="text-center">
-      <div className="canvas-container h-[400px]">
-        <canvas ref={canvasRef} height={height} width={width} />
-      </div>
-      <input
-        type="range"
-        className="w-full md:w-1/2"
-        min={0.5}
-        max={2}
-        step={0.01}
-        onChange={handleResize}
+    <div ref={containerRef} className="w-full h-96">
+      <canvas
+        ref={canvasRef}
+        onMouseDown={(e) => setDragStart({ x: e.clientX, y: e.clientY })}
+        onTouchStart={(e) => {
+          if (e.touches.length === 1) {
+            setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+          } else {
+            setPinchDist(getPinchDist(e));
+          }
+        }}
+        onMouseMove={(e) => onMove(e.clientX, e.clientY)}
+        onTouchMove={(e) => {
+          if (e.touches.length === 1) {
+            onMove(e.touches[0].clientX, e.touches[0].clientY);
+          } else {
+            const dist = getPinchDist(e);
+            onZoom(dist > pinchDist);
+            setPinchDist(dist);
+          }
+        }}
+        onMouseUp={onUp}
+        onTouchEnd={onUp}
+        onWheel={(e) => onZoom(e.deltaY > 0)}
       />
     </div>
   );

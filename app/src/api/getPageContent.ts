@@ -6,29 +6,11 @@ const mdxString = `
 
 This is some *mdx* markdown text
 
-<Canvas height={500} width={5000} draw={async (ctx) => {
+<Canvas draw={(ctx) => {
 
   ctx.beginPath();
 
-  ctx.arc(250, 250, 20, 0, 2 * Math.PI);
-
-  ctx.closePath();
-
-  ctx.stroke();
-
-}} />
-
-This is some <u>mdx</u> markdown text
-
-<Canvas height={400} width={500} draw={async (ctx) => {
-
-  ctx.beginPath();
-
-  ctx.moveTo(100, 100);
-  ctx.lineTo(200, 100);
-  ctx.lineTo(200, 200);
-  ctx.lineTo(100, 200);
-  ctx.lineTo(100, 100);
+  ctx.arc(100, 100, 20, 0, 2 * Math.PI);
 
   ctx.closePath();
 
@@ -51,9 +33,7 @@ const getPageContent = async () => {
       "Content-type": "application/json; charset=UTF-8",
     },
   });
-
   const data = (await response).json();
-
   return data;
 };
 

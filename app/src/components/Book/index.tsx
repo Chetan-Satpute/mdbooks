@@ -11,7 +11,8 @@ const Book: FC = () => {
   const [source, Loading] = useFetch(getPageContent);
 
   return (
-    <div className="overflow-auto max-w-[1000px] h-screen m-auto markdown-body p-3 no-scrollbar">
+    <div className="overflow-auto h-screen no-scrollbar">
+    <div className="max-w-[1000px] m-auto markdown-body p-3 ">
       <Loading>
         <Page source={source} />
 
@@ -30,6 +31,7 @@ const Book: FC = () => {
           </Button>
         </div>
       </Loading>
+      </div>
     </div>
   );
 }
