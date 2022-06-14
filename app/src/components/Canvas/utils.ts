@@ -4,16 +4,6 @@ import { MouseEvent, TouchEvent } from "react";
 
 export type Pair = { x: number; y: number };
 
-export const prepareCanvas = (
-  canvas: HTMLCanvasElement,
-  container: HTMLDivElement
-) => {
-  const containerRect = container.getBoundingClientRect();
-
-  canvas.height = containerRect.height;
-  canvas.width = containerRect.width;
-};
-
 export const setupContext = (ctx: CanvasRenderingContext2D) => {
   ctx.strokeStyle = "#c9d1d9";
   ctx.lineWidth = 2;

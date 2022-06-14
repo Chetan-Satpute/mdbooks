@@ -3,12 +3,13 @@ import {
   getPinchDist,
   getPosition,
   Pair,
-  prepareCanvas,
   setupContext,
 } from "./utils";
 
 interface IProps {
   draw: (ctx: CanvasRenderingContext2D) => FrameRequestCallback;
+  height: number;
+  width: number;
 }
 
 interface IState {
@@ -48,9 +49,22 @@ class Canvas extends React.Component<IProps, IState> {
 
     const ctx = canvas.getContext("2d");
 
-    prepareCanvas(canvas, container);
-    setupContext(ctx);
+    const containerRect = container.getBoundingClientRect();
 
+    canvas.height = containerRect.height;
+    canvas.width = containerRect.width;
+
+    // center the drawing
+    if (this.props.width < containerRect.width) {
+      this.translate.x = canvas.width / 2 - this.props.width / 2;
+    }
+    if (this.props.height < containerRect.height) {
+      this.translate.y = canvas.height / 2 - this.props.height / 2;
+    }
+    this.prevTranslate = this.translate;
+
+    setupContext(ctx);
+    
     const step = this.props.draw(ctx);
 
     const render: FrameRequestCallback = (timestamp) => {
@@ -143,6 +157,23 @@ class Canvas extends React.Component<IProps, IState> {
   handleDoubleClick: React.MouseEventHandler<HTMLCanvasElement> = () => {
     this.scale = {x: 1, y: 1};
     this.translate = { x: 0, y: 0 };
+    this.dragStart = undefined;
+
+    const canvas = this.canvasRef.current;
+    const container = this.containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+
+    // center the drawing
+    if (this.props.width < containerRect.width) {
+      this.translate.x = canvas.width / 2 - this.props.width / 2;
+    }
+
+    if (this.props.height < containerRect.height) {
+      this.translate.y = canvas.height / 2 - this.props.height / 2;
+    }
+
+    this.prevTranslate = this.translate;
+
   };
 
   ////////////////////////////////////////////////////////////

@@ -6,25 +6,32 @@ const mdxString = `
 
 This is some *mdx* markdown text
 
-<Canvas draw={(ctx) => {
-
-  let x = 0;
-
+<Canvas height={40} width={40} draw={(ctx) => {
   return () => {
     ctx.beginPath();
 
-    ctx.arc(100 + x, 100, 20, 0, 2 * Math.PI);
+    ctx.arc(20, 20, 20, 0, 2 * Math.PI);
 
     ctx.closePath();
 
     ctx.stroke();
-
-     if (x !== 50)
-     x += 2;
   }
-
 }} />
 
+<Canvas height={40} width={40} draw={(ctx) => {
+  return () => {
+    ctx.beginPath();
+
+    ctx.moveTo(20, 20);
+    ctx.lineTo(40, 20);
+    ctx.lineTo(40, 40);
+    ctx.lineTo(20, 40);
+
+    ctx.closePath();
+
+    ctx.stroke();
+  }
+}} />
 `;
 
 const getPageContent = async () => {
