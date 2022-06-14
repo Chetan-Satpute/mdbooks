@@ -8,13 +8,20 @@ This is some *mdx* markdown text
 
 <Canvas draw={(ctx) => {
 
-  ctx.beginPath();
+  let x = 0;
 
-  ctx.arc(100, 100, 20, 0, 2 * Math.PI);
+  return () => {
+    ctx.beginPath();
 
-  ctx.closePath();
+    ctx.arc(100 + x, 100, 20, 0, 2 * Math.PI);
 
-  ctx.stroke();
+    ctx.closePath();
+
+    ctx.stroke();
+
+     if (x !== 50)
+     x += 2;
+  }
 
 }} />
 

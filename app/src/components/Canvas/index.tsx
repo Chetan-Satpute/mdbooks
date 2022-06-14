@@ -1,111 +1,169 @@
-import React, { FC, useRef, useLayoutEffect, useState } from "react";
-import { getPinchDist } from "./utils";
-
-export type DrawFunction = (cxt: CanvasRenderingContext2D) => void;
-export type Pair = { x: number; y: number };
+import React from "react";
+import {
+  getPinchDist,
+  getPosition,
+  Pair,
+  prepareCanvas,
+  setupContext,
+} from "./utils";
 
 interface IProps {
-  draw: DrawFunction;
+  draw: (ctx: CanvasRenderingContext2D) => FrameRequestCallback;
 }
 
-const Canvas: FC<IProps> = ({ draw }) => {
-  const containerRef = useRef<HTMLDivElement>();
-  const canvasRef = useRef<HTMLCanvasElement>();
+interface IState {
+  scale: Pair;
+  translate: Pair;
+}
 
-  const [scale, setScale] = useState<Pair>({ x: 1, y: 1 });
-  const [pinchDist, setPinchDist] = useState<number>(0);
+class Canvas extends React.Component<IProps, IState> {
+  containerRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
 
-  const [dragStart, setDragStart] = useState<Pair>();
-  const [translate, setTranslate] = useState<[Pair, Pair]>([
-    { x: 0, y: 0 }, // current
-    { x: 0, y: 0 }, // previous
-  ]);
+  animationFrameID: number;
 
-  useLayoutEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    const containerRect = container.getBoundingClientRect();
+  scale: Pair;
+  translate: Pair;
 
-    canvas.height = containerRect.height;
-    canvas.width = containerRect.width;
-  }, []);
+  dragStart: Pair;
+  prevPinchDistance: number;
+  prevTranslate: Pair;
 
-  const render = async () => {
-    // wait for next animation frame
-    await new Promise((resolve) => window.requestAnimationFrame(resolve));
+  constructor(props: IProps) {
+    super(props);
 
-    const canvas = canvasRef.current;
+    this.containerRef = React.createRef<HTMLDivElement>();
+    this.canvasRef = React.createRef<HTMLCanvasElement>();
+
+    this.scale = { x: 1, y: 1 };
+    this.translate = { x: 0, y: 0 };
+    this.dragStart = undefined;
+    this.prevTranslate = { x: 0, y: 0 };
+    this.prevPinchDistance = 0;
+  }
+
+  componentDidMount(): void {
+    const canvas = this.canvasRef.current;
+    const container = this.containerRef.current;
+
     const ctx = canvas.getContext("2d");
 
-    // Setup Canvas
-    ctx.setTransform(scale.x, 0, 0, scale.y, translate[0].x, translate[0].y);
-    ctx.clearRect(-1000, -1000, canvas.width + 1000, canvas.height + 1000);
+    prepareCanvas(canvas, container);
+    setupContext(ctx);
 
-    // default styles
-    ctx.strokeStyle = "#c9d1d9";
-    ctx.lineWidth = 2;
+    const step = this.props.draw(ctx);
 
-    // Draw
-    draw(ctx);
-  };
+    const render: FrameRequestCallback = (timestamp) => {
+      // transform context
+      ctx.setTransform(
+        this.scale.x,
+        0,
+        0,
+        this.scale.y,
+        this.translate.x,
+        this.translate.y
+      );
 
-  useLayoutEffect(() => {
-    render();
-  }, [translate, scale]);
+      // Clear canvas before drawing next frame
+      ctx.clearRect(-1000, -1000, canvas.width + 10000, canvas.height + 10000);
 
-  const onMove = (x: number, y: number) => {
-    if (dragStart !== undefined) {
-      setTranslate([
-        {
-          x: translate[1].x + (x - dragStart.x),
-          y: translate[1].y + (y - dragStart.y),
-        },
-        translate[1],
-      ]);
+      step(timestamp);
+      this.animationFrameID = window.requestAnimationFrame(render);
+    };
+
+    this.animationFrameID = window.requestAnimationFrame(render);
+  }
+
+  componentWillUnmount(): void {
+    window.cancelAnimationFrame(this.animationFrameID);
+  }
+
+  translateCanvas = (x: number, y: number) => {
+    if (this.dragStart !== undefined) {
+      this.translate = {
+        x: this.prevTranslate.x + (x - this.dragStart.x),
+        y: this.prevTranslate.y + (y - this.dragStart.y),
+      };
     }
   };
 
-  const onUp = () => {
-    setDragStart(undefined);
-    setTranslate([translate[0], translate[0]]);
+  scaleCanvas = (x: number, y: number, up: boolean) => {
+    const delta = 0.01 * (up ? 1 : -1);
+
+    this.scale = {
+      x: this.scale.x + delta,
+      y: this.scale.y + delta,
+    };
   };
 
-  const onZoom = (zoomIn: boolean) => {
-    const { x, y } = scale;
+  //////////////////// Event Handlers ////////////////////
 
-    const delta = 0.01 * (zoomIn ? 1 : -1);
-
-    setScale({ x: x + delta, y: y + delta });
+  handleMouseDown: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    this.dragStart = getPosition(e) as Pair;
+  };
+  
+  handleTouchStart: React.TouchEventHandler<HTMLCanvasElement> = (e) => {
+    if (e.touches.length === 1) {
+      this.dragStart = getPosition(e) as Pair;
+    } else {
+      this.prevPinchDistance = getPinchDist(e);
+    }
   };
 
-  return (
-    <div ref={containerRef} className="w-full h-96">
-      <canvas
-        ref={canvasRef}
-        onMouseDown={(e) => setDragStart({ x: e.clientX, y: e.clientY })}
-        onTouchStart={(e) => {
-          if (e.touches.length === 1) {
-            setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-          } else {
-            setPinchDist(getPinchDist(e));
-          }
-        }}
-        onMouseMove={(e) => onMove(e.clientX, e.clientY)}
-        onTouchMove={(e) => {
-          if (e.touches.length === 1) {
-            onMove(e.touches[0].clientX, e.touches[0].clientY);
-          } else {
-            const dist = getPinchDist(e);
-            onZoom(dist > pinchDist);
-            setPinchDist(dist);
-          }
-        }}
-        onMouseUp={onUp}
-        onTouchEnd={onUp}
-        onWheel={(e) => onZoom(e.deltaY > 0)}
-      />
-    </div>
-  );
-};
+  handleMouseMove: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const { x, y } = getPosition(e) as Pair;
+    this.translateCanvas(x, y);
+  };
+
+  handleTouchMove: React.TouchEventHandler<HTMLCanvasElement> = (e) => {
+    const { x, y } = getPosition(e) as Pair;
+    if (e.touches.length === 1) {
+      this.translateCanvas(x, y);
+    } else {
+      const pinchDistance = getPinchDist(e);
+      this.scaleCanvas(x, y, pinchDistance > this.prevPinchDistance);
+      this.prevPinchDistance = pinchDistance;
+    }
+  };
+
+  handleMouseUp: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    this.dragStart = undefined;
+    this.prevTranslate = this.translate;
+  };
+
+  handleTouchEnd: React.TouchEventHandler<HTMLCanvasElement> = (e) => {
+    this.dragStart = undefined;
+    this.prevTranslate = this.translate;
+  };
+
+  handleWheel: React.WheelEventHandler<HTMLCanvasElement> = (e) => {
+    this.scaleCanvas(e.clientX, e.clientY, e.deltaY > 0);
+  };
+
+  handleDoubleClick: React.MouseEventHandler<HTMLCanvasElement> = () => {
+    this.scale = {x: 1, y: 1};
+    this.translate = { x: 0, y: 0 };
+  };
+
+  ////////////////////////////////////////////////////////////
+
+  render(): React.ReactNode {
+    return (
+      <div ref={this.containerRef} className="h-96">
+        <canvas
+          ref={this.canvasRef}
+          onMouseDown={this.handleMouseDown}
+          onTouchStart={this.handleTouchStart}
+          onMouseMove={this.handleMouseMove}
+          onTouchMove={this.handleTouchMove}
+          onMouseUp={this.handleMouseUp}
+          onTouchEnd={this.handleTouchEnd}
+          onWheel={this.handleWheel}
+          onDoubleClick={this.handleDoubleClick}
+        />
+      </div>
+    );
+  }
+}
 
 export default Canvas;
