@@ -2,8 +2,6 @@ import { SERVER_URL } from ".";
 
 const mdxString = `
 
-# Hello World
-
 This is some *mdx* markdown text
 
 <Canvas height={40} width={40} draw={(ctx) => {
@@ -18,20 +16,21 @@ This is some *mdx* markdown text
   }
 }} />
 
-<Canvas height={40} width={40} draw={(ctx) => {
+{/* <Canvas height={20} width={20} draw={(ctx) => {
   return () => {
     ctx.beginPath();
 
-    ctx.moveTo(20, 20);
-    ctx.lineTo(40, 20);
-    ctx.lineTo(40, 40);
-    ctx.lineTo(20, 40);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(20, 0);
+    ctx.lineTo(20, 20);
+    ctx.lineTo(0, 20);
 
     ctx.closePath();
 
     ctx.stroke();
   }
 }} />
+*/}
 `;
 
 const getPageContent = async () => {

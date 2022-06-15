@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  getPinchDist,
-  getPosition,
-  Pair,
-  setupContext,
-} from "./utils";
+import { getPinchDist, getPosition, Pair, setupContext } from "./utils";
 
 interface IProps {
   draw: (ctx: CanvasRenderingContext2D) => FrameRequestCallback;
@@ -13,8 +8,7 @@ interface IProps {
 }
 
 interface IState {
-  scale: Pair;
-  translate: Pair;
+  active: boolean;
 }
 
 class Canvas extends React.Component<IProps, IState> {
@@ -36,6 +30,10 @@ class Canvas extends React.Component<IProps, IState> {
     this.containerRef = React.createRef<HTMLDivElement>();
     this.canvasRef = React.createRef<HTMLCanvasElement>();
 
+    this.state = {
+      active: false,
+    };
+
     this.scale = { x: 1, y: 1 };
     this.translate = { x: 0, y: 0 };
     this.dragStart = undefined;
@@ -54,17 +52,9 @@ class Canvas extends React.Component<IProps, IState> {
     canvas.height = containerRect.height;
     canvas.width = containerRect.width;
 
-    // center the drawing
-    if (this.props.width < containerRect.width) {
-      this.translate.x = canvas.width / 2 - this.props.width / 2;
-    }
-    if (this.props.height < containerRect.height) {
-      this.translate.y = canvas.height / 2 - this.props.height / 2;
-    }
-    this.prevTranslate = this.translate;
-
+    this.centerDrawing();
     setupContext(ctx);
-    
+
     const step = this.props.draw(ctx);
 
     const render: FrameRequestCallback = (timestamp) => {
@@ -93,21 +83,41 @@ class Canvas extends React.Component<IProps, IState> {
   }
 
   translateCanvas = (x: number, y: number) => {
-    if (this.dragStart !== undefined) {
-      this.translate = {
-        x: this.prevTranslate.x + (x - this.dragStart.x),
-        y: this.prevTranslate.y + (y - this.dragStart.y),
-      };
+    if (this.state.active) {
+      if (this.dragStart !== undefined) {
+        this.translate = {
+          x: this.prevTranslate.x + (x - this.dragStart.x),
+          y: this.prevTranslate.y + (y - this.dragStart.y),
+        };
+      }
     }
   };
 
   scaleCanvas = (x: number, y: number, up: boolean) => {
-    const delta = 0.01 * (up ? 1 : -1);
+    if (this.state.active) {
+      const delta = 0.01 * (up ? 1 : -1);
 
-    this.scale = {
-      x: this.scale.x + delta,
-      y: this.scale.y + delta,
-    };
+      this.scale = {
+        x: this.scale.x + delta,
+        y: this.scale.y + delta,
+      };
+    }
+  };
+
+  centerDrawing = () => {
+    const canvas = this.canvasRef.current;
+    const container = this.containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+
+    if (this.props.width < containerRect.width) {
+      this.translate.x = canvas.width / 2 - this.props.width / 2;
+    }
+
+    if (this.props.height < containerRect.height) {
+      this.translate.y = canvas.height / 2 - this.props.height / 2;
+    }
+
+    this.prevTranslate = this.translate;
   };
 
   //////////////////// Event Handlers ////////////////////
@@ -115,7 +125,7 @@ class Canvas extends React.Component<IProps, IState> {
   handleMouseDown: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
     this.dragStart = getPosition(e) as Pair;
   };
-  
+
   handleTouchStart: React.TouchEventHandler<HTMLCanvasElement> = (e) => {
     if (e.touches.length === 1) {
       this.dragStart = getPosition(e) as Pair;
@@ -155,32 +165,22 @@ class Canvas extends React.Component<IProps, IState> {
   };
 
   handleDoubleClick: React.MouseEventHandler<HTMLCanvasElement> = () => {
-    this.scale = {x: 1, y: 1};
+    this.scale = { x: 1, y: 1 };
     this.translate = { x: 0, y: 0 };
     this.dragStart = undefined;
+    this.centerDrawing();
 
-    const canvas = this.canvasRef.current;
-    const container = this.containerRef.current;
-    const containerRect = container.getBoundingClientRect();
-
-    // center the drawing
-    if (this.props.width < containerRect.width) {
-      this.translate.x = canvas.width / 2 - this.props.width / 2;
-    }
-
-    if (this.props.height < containerRect.height) {
-      this.translate.y = canvas.height / 2 - this.props.height / 2;
-    }
-
-    this.prevTranslate = this.translate;
-
+    this.setState({ active: !this.state.active });
   };
 
   ////////////////////////////////////////////////////////////
 
   render(): React.ReactNode {
     return (
-      <div ref={this.containerRef} className="h-96">
+      <div
+        ref={this.containerRef}
+        className={`h-96 ${this.state.active ? "border-2" : ""}`}
+      >
         <canvas
           ref={this.canvasRef}
           onMouseDown={this.handleMouseDown}
