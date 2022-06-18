@@ -16,7 +16,50 @@ This is some *mdx* markdown text
   }
 }} />
 
-{/* <Canvas height={20} width={20} draw={(ctx) => {
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+This is some *mdx* markdown text
+
+<Canvas height={20} width={20} draw={(ctx) => {
   return () => {
     ctx.beginPath();
 
@@ -30,7 +73,7 @@ This is some *mdx* markdown text
     ctx.stroke();
   }
 }} />
-*/}
+
 `;
 
 const getPageContent = async () => {

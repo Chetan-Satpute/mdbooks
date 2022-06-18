@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import useFetch from "../../hooks/useFetch";
 import getPageContent from "../../api/getPageContent";
-import Button from "../Button";
 import Page from "../Page";
 
 import "github-markdown-css/github-markdown-dark.css";
@@ -12,20 +11,17 @@ const Book: FC = () => {
 
   return (
     <div className="overflow-auto h-screen no-scrollbar">
-      <div className="max-w-[1000px] m-auto markdown-body p-3 ">
-        <div className="border-b border-b-neutral-200">
-          <button className="material-symbols-rounded font-bold text-4xl">
-            navigate_before
-          </button>
-          <span className="text-xl font-bold float-right">
-            Hello World!
-          </span>
-        </div>
+      <div className="max-w-[1000px] m-auto markdown-body">
         <Loading>
           <Page source={source} />
 
-          <div className="flex justify-center space-x-5 pt-10 pb-5">
-          <button className="bg-green-500 hover:bg-green-700 font-bold text-white p-3 rounded-md w-1/2">Alright!</button>
+          <div className="flex items-center flex-col space-y-3 pt-10 pb-5">
+            <button className="bg-green-500 hover:bg-green-700 font-bold text-white p-3 rounded-md w-2/3 md:w-1/2">
+              Alright!
+            </button>
+            <button className="bg-neutral-500 hover:bg-neutral-700 font-bold text-white p-3 rounded-md w-2/3 md:w-1/2">
+              Go Back
+            </button>
           </div>
         </Loading>
       </div>
