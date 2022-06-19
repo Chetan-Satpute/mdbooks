@@ -179,6 +179,12 @@ class Canvas extends React.Component<IProps, IState> {
 
         const delta = Canvas.SCALE_SENSITIVITY * (zoomUP ? -1 : 1);
 
+        const xDist = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - this.canvasRef.current.getBoundingClientRect().x - this.translate.curr.x;
+        const yDist = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - this.canvasRef.current.getBoundingClientRect().y - this.translate.curr.y;
+
+        this.translate.curr.x -= (this.scale.x + delta) * (xDist / this.scale.x) - xDist;
+        this.translate.curr.y -= (this.scale.y + delta) * (yDist / this.scale.y) - yDist;
+
         this.scale = {
           x: this.scale.x + delta,
           y: this.scale.y + delta,
@@ -205,6 +211,12 @@ class Canvas extends React.Component<IProps, IState> {
       e.preventDefault();
 
       const delta = Canvas.SCALE_SENSITIVITY * (e.deltaY > 0 ? -1 : 1);
+
+      const xDist = e.clientX - this.canvasRef.current.getBoundingClientRect().x - this.translate.curr.x;
+      const yDist = e.clientY - this.canvasRef.current.getBoundingClientRect().y - this.translate.curr.y;
+
+      this.translate.curr.x -= (this.scale.x + delta) * (xDist / this.scale.x) - xDist;
+      this.translate.curr.y -= (this.scale.y + delta) * (yDist / this.scale.y) - yDist;
 
       this.scale = {
         x: this.scale.x + delta,
@@ -243,7 +255,10 @@ class Canvas extends React.Component<IProps, IState> {
             onDoubleClick={this.handleDoubleClick}
           />
         ) : (
-          <canvas ref={this.canvasRef} onDoubleClick={this.handleDoubleClick} />
+          <canvas
+            ref={this.canvasRef}
+            onDoubleClick={this.handleDoubleClick}
+          />
         )}
       </div>
     );

@@ -4,11 +4,16 @@ const mdxString = `
 
 This is some *mdx* markdown text
 
-<Canvas height={40} width={40} draw={(ctx) => {
+<Canvas height={80} width={80} draw={(ctx) => {
   return () => {
     ctx.beginPath();
 
-    ctx.arc(20, 20, 20, 0, 2 * Math.PI);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(20, 0);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, 20);
+
+    ctx.arc(60, 60, 20, 0, 2 * Math.PI);
 
     ctx.closePath();
 
