@@ -1,20 +1,22 @@
 import React, { FC, useEffect, useState } from "react";
 
-type getDataFunction = (...args: any[]) => Promise<any>;
+export type getDataFunction = (...args: any[]) => Promise<any>;
 
 interface ILoadingProps {
   spinner?: React.FC;
   children: React.ReactNode;
 }
 
-const useFetch = (getData: getDataFunction) => {
+const useFetch = (getData: getDataFunction, ...args: any[]) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>();
 
-  const fetchData = async () => {
-    const data = await getData();
+  const fetchData = async (...params: any[]) => {
+    setLoading(true);
 
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    const data = await getData(...params);
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setData(data);
     setLoading(false);
@@ -22,7 +24,7 @@ const useFetch = (getData: getDataFunction) => {
 
   useEffect(() => {
     if (loading === true) {
-      fetchData();
+      fetchData(...args);
     }
   }, [loading]);
 
@@ -34,7 +36,7 @@ const useFetch = (getData: getDataFunction) => {
     return <>{children}</>;
   };
 
-  return [data, Loading];
+  return [data, Loading, fetchData];
 };
 
 export default useFetch;

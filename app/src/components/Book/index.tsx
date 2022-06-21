@@ -3,15 +3,12 @@ import useFetch from "../../hooks/useFetch";
 import getPageContent from "../../api/getPageContent";
 import Page from "../Page";
 
-import "github-markdown-css/github-markdown-dark.css";
-import "./index.css";
-
 const Book: FC = () => {
   const [source, Loading] = useFetch(getPageContent);
 
   return (
     <div className="overflow-auto h-screen no-scrollbar">
-      <div className="max-w-[1000px] m-auto markdown-body">
+      <div className="max-w-[1000px] m-auto">
         <Loading>
           <Page source={source} />
 

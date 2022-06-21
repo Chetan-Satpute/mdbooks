@@ -242,7 +242,7 @@ class Canvas extends React.Component<IProps, IState> {
     return (
       <div
         ref={this.containerRef}
-        className={`${this.state.active ? "border-2" : ""} h-56 md:h-80`}
+        className={`${this.state.active ? "border-2" : ""} h-56 md:h-80 rounded-lg`}
       >
         {this.state.active ? (
           <canvas
