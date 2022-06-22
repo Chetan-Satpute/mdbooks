@@ -10,7 +10,7 @@ const Book: FC = () => {
     <div className="overflow-auto h-screen no-scrollbar">
       <div className="max-w-[1000px] m-auto">
         <Loading>
-          <Page source={source} />
+          <Page data={source} />
 
           <div className="flex items-center flex-col space-y-3 pt-10 pb-5">
             <button className="bg-green-500 hover:bg-green-700 font-bold text-white p-3 rounded-md w-2/3 md:w-1/2">
