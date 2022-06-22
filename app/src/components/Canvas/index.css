@@ -1,0 +1,27 @@
+.canvas-container {
+    overflow: auto;
+}
+
+.canvas-container::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.canvas-container::-webkit-scrollbar-track {
+  border-radius: 5px;
+}
+
+.canvas-container::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  background: gray;
+}
+
+.canvas-container::-webkit-scrollbar-thumb:window-inactive {
+  background: gray;
+}
+
+.canvas-container::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
