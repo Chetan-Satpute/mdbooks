@@ -92,6 +92,10 @@ class Canvas extends React.Component<IProps, IState> {
     const ctx = canvas.getContext("2d");
 
     // TODO: HERE 4 is border (find a better implementation
+    container.setAttribute(
+      "style",
+      `height: ${Math.max(this.props.height, container.clientHeight)}`
+    );
     canvas.height = container.clientHeight - 4;
     canvas.width = container.clientWidth - 4;
 
@@ -179,11 +183,21 @@ class Canvas extends React.Component<IProps, IState> {
 
         const delta = Canvas.SCALE_SENSITIVITY * (zoomUP ? -1 : 1);
 
-        const xDist = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - this.canvasRef.current.getBoundingClientRect().x - this.translate.curr.x;
-        const yDist = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - this.canvasRef.current.getBoundingClientRect().y - this.translate.curr.y;
+        const xDist =
+          (e.touches[0].clientX + e.touches[1].clientX) / 2 -
+          this.canvasRef.current.getBoundingClientRect().x -
+          this.translate.curr.x;
+        const yDist =
+          (e.touches[0].clientY + e.touches[1].clientY) / 2 -
+          this.canvasRef.current.getBoundingClientRect().y -
+          this.translate.curr.y;
 
-        this.translate.curr.x -= (this.scale.x + delta) * (xDist / this.scale.x) - xDist;
-        this.translate.curr.y -= (this.scale.y + delta) * (yDist / this.scale.y) - yDist;
+        this.translate.curr.x -=
+          (this.scale.x + delta) * (xDist / this.scale.x) - xDist;
+        this.translate.curr.y -=
+          (this.scale.y + delta) * (yDist / this.scale.y) - yDist;
+
+        this.translate.prev = { ...this.translate.curr };
 
         this.scale = {
           x: this.scale.x + delta,
@@ -212,11 +226,21 @@ class Canvas extends React.Component<IProps, IState> {
 
       const delta = Canvas.SCALE_SENSITIVITY * (e.deltaY > 0 ? -1 : 1);
 
-      const xDist = e.clientX - this.canvasRef.current.getBoundingClientRect().x - this.translate.curr.x;
-      const yDist = e.clientY - this.canvasRef.current.getBoundingClientRect().y - this.translate.curr.y;
+      const xDist =
+        e.clientX -
+        this.canvasRef.current.getBoundingClientRect().x -
+        this.translate.curr.x;
+      const yDist =
+        e.clientY -
+        this.canvasRef.current.getBoundingClientRect().y -
+        this.translate.curr.y;
 
-      this.translate.curr.x -= (this.scale.x + delta) * (xDist / this.scale.x) - xDist;
-      this.translate.curr.y -= (this.scale.y + delta) * (yDist / this.scale.y) - yDist;
+      this.translate.curr.x -=
+        (this.scale.x + delta) * (xDist / this.scale.x) - xDist;
+      this.translate.curr.y -=
+        (this.scale.y + delta) * (yDist / this.scale.y) - yDist;
+
+      this.translate.prev = { ...this.translate.curr };
 
       this.scale = {
         x: this.scale.x + delta,
@@ -242,7 +266,9 @@ class Canvas extends React.Component<IProps, IState> {
     return (
       <div
         ref={this.containerRef}
-        className={`${this.state.active ? "border-2" : ""} h-56 md:h-80 rounded-lg`}
+        className={`${
+          this.state.active ? "border-2" : ""
+        } h-56 md:h-80 rounded-lg`}
       >
         {this.state.active ? (
           <canvas
@@ -255,10 +281,7 @@ class Canvas extends React.Component<IProps, IState> {
             onDoubleClick={this.handleDoubleClick}
           />
         ) : (
-          <canvas
-            ref={this.canvasRef}
-            onDoubleClick={this.handleDoubleClick}
-          />
+          <canvas ref={this.canvasRef} onDoubleClick={this.handleDoubleClick} />
         )}
       </div>
     );

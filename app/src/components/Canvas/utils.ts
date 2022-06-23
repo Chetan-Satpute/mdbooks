@@ -1,5 +1,3 @@
-// https://codepen.io/chengarda/pen/wRxoyB
-
 import { MouseEvent, TouchEvent } from "react";
 
 export type Pair = { x: number; y: number };

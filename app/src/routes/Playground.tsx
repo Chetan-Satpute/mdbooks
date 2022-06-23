@@ -4,6 +4,7 @@ import Editor from "@monaco-editor/react";
 import Page from "../components/Page";
 import useFetch from "../hooks/useFetch";
 import getJSX from "../api/getJSX";
+import Spinner from "../components/Spinner";
 
 const Playground: FC = () => {
   const [mdx, setMDX] = useState(defaultMDX);
@@ -27,7 +28,7 @@ const Playground: FC = () => {
       </div>
       <div className="flex-auto flex p-3">
         <div className="flex-auto w-3/5 p-3">
-          <Loading spinner={<span className="text-white">spinner...</span>}>
+          <Loading spinner={<Spinner />}>
             <Page data={data} />
           </Loading>
         </div>
@@ -36,6 +37,7 @@ const Playground: FC = () => {
             theme="vs-dark"
             defaultLanguage="markdown"
             defaultValue={mdx}
+            loading={<Spinner />}
             onChange={handleChange}
           />
         </div>
