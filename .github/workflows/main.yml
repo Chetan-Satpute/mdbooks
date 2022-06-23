@@ -1,0 +1,54 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "deploy" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  app:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+        with:
+          path: main
+
+      - name: Checkout pages repo
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          path: pages
+
+      - name: Build React app
+        run: |
+          npm install
+          npm run build
+          ls -alh dist/
+        working-directory: main/app
+
+      - name: Copy new build files in pages
+        run: |
+          rm -rf pages/*
+          mv main/app/dist/* pages/
+          ls -alh pages/
+      
+      - name: Commit push new changes in pages
+        run: |
+          git config user.name Chetan-Satpute
+          git config user.email Chetan-Satpute@users.noreply.github.com
+          git add --all
+          git commit -m "Deploy mdbooks frontend"
+          git push origin gh-pages
+        working-directory: pages
