@@ -3,6 +3,8 @@ import { MDXRemote } from "next-mdx-remote";
 import Canvas from "../Canvas";
 
 import "github-markdown-css/github-markdown-dark.css";
+import "prism-theme-night-owl";
+import "./index.css";
 
 let components = { Canvas };
 
@@ -18,10 +20,7 @@ const Page: FC<{ data: any }> = ({ data }) => {
   return (
     <ErrorBoundary>
       <div className="markdown-body">
-        <MDXRemote
-          {...data.source}
-          components={components}
-        />
+        <MDXRemote {...data.source} components={components} />
       </div>
     </ErrorBoundary>
   );

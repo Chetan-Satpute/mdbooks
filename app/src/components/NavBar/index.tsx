@@ -1,6 +1,4 @@
 import React, { FC, useState } from "react";
-import getPageTitles from "../../api/getPageTitles";
-import useFetch from "../../hooks/useFetch";
 import Modal from "../Modal";
 
 interface IProps {
@@ -8,7 +6,6 @@ interface IProps {
 }
 
 const NavBar: FC<IProps> = ({ loadArticle }) => {
-  const [data, Loading] = useFetch(getPageTitles);
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -24,16 +21,15 @@ const NavBar: FC<IProps> = ({ loadArticle }) => {
       </button>
 
       {showModal && (
-        <Loading spinner={<></>}>
-          <Modal data={data} loadArticle={async (name) => {
+        <Modal
+          loadArticle={async (name) => {
             setShowModal(false);
             await loadArticle(name);
-          }} />
-        </Loading>
+          }}
+        />
       )}
     </div>
   );
 };
-
 
 export default NavBar;

@@ -38,12 +38,12 @@ const Playground: FC<IProps> = ({ data: { pages } }) => {
 
   return (
     <div className="flex-auto flex flex-col md:flex-row min-h-0">
-      <div className={`w-full md:w-3/5 h-3/5 md:h-auto overflow-auto no-scrollbar p-3`}>
+      <div className={`w-full md:w-1/2 h-3/5 md:h-auto overflow-auto no-scrollbar p-3`}>
         <Loading spinner={<Spinner />}>
           <Page data={data} />
         </Loading>
       </div>
-        <div className="md:w-2/5 m-3 h-2/5 md:h-auto py-5 rounded-xl border-2 border-cyan-400 bg-[#1e1e1e]">
+        <div className="md:w-1/2 m-3 h-2/5 md:h-auto py-5 rounded-xl border-2 border-cyan-400 bg-[#1e1e1e]">
           <Editor
             theme="vs-dark"
             value={mdx}

@@ -3,13 +3,16 @@ import React, { FC, useEffect, useState } from "react";
 export type getDataFunction = (...args: any[]) => Promise<any>;
 
 interface ILoadingProps {
-  spinner?: React.FC;
+  spinner?: React.ReactNode;
   children: React.ReactNode;
 }
 
-const useFetch = (getData: getDataFunction, ...args: any[]) => {
+const useFetch = <T,>(
+  getData: getDataFunction,
+  ...args: any[]
+): [T, FC<ILoadingProps>, (...params: any[]) => Promise<void>] => {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>();
+  const [data, setData] = useState<T>();
 
   const fetchData = async (...params: any[]) => {
     setLoading(true);

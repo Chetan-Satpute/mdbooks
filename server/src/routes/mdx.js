@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { serialize } from "next-mdx-remote/serialize";
 import rehypeKatex from "rehype-katex";
+import rehypeMathJaxSvg from "rehype-mathjax";
 import remarkMath from "remark-math";
+import remarkPrism from 'remark-prism';
 import status from "status-code";
 
 const router = Router();
@@ -18,8 +20,8 @@ router.route("/").post(async (req, res) => {
 
     const compiledSource = await serialize(source, {
       mdxOptions: {
-        remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex],
+        remarkPlugins: [remarkMath, remarkPrism],
+        rehypePlugins: [rehypeMathJaxSvg],
         format: "mdx",
       },
     });
