@@ -50,6 +50,19 @@ class Canvas extends React.Component<IProps, IState> {
     };
 
     this.pinchZoomDist = 0;
+
+    if (this.props.height === undefined) {
+      throw new Error("<Canvas /> requires a height attribute !" + sampleCanvasCode);
+    }
+
+    if (this.props.width === undefined) {
+      throw new Error("<Canvas /> requires a width attribute !" + sampleCanvasCode);
+    }
+
+    if (this.props.draw === undefined) {
+      throw new Error("<Canvas /> requires a draw function as attribute !" + sampleCanvasCode);
+    }
+
   }
 
   componentDidMount(): void {
@@ -92,10 +105,6 @@ class Canvas extends React.Component<IProps, IState> {
     const ctx = canvas.getContext("2d");
 
     // TODO: HERE 4 is border (find a better implementation
-    container.setAttribute(
-      "style",
-      `height: ${Math.max(this.props.height, container.clientHeight)}`
-    );
     canvas.height = container.clientHeight - 4;
     canvas.width = container.clientWidth - 4;
 
@@ -266,9 +275,8 @@ class Canvas extends React.Component<IProps, IState> {
     return (
       <div
         ref={this.containerRef}
-        className={`${
-          this.state.active ? "border-2" : ""
-        } h-56 md:h-80 rounded-lg`}
+        className={`${this.state.active ? "border-2" : ""} rounded-lg`}
+        style={{ height: `${Math.max(224, this.props.height)}px` }}
       >
         {this.state.active ? (
           <canvas
@@ -289,3 +297,36 @@ class Canvas extends React.Component<IProps, IState> {
 }
 
 export default Canvas;
+
+const sampleCanvasCode = `
+
+Sample <Canvas /> code:
+
+<Canvas
+    height={200}
+    width={200}
+    draw={(ctx) => {
+    
+        return () => {
+            ctx.beginPath();
+
+            ctx.moveTo(50, 100);
+            ctx.arc(100, 100, 50, 0, Math.PI * 2);
+            
+            ctx.closePath();
+
+            ctx.stroke();
+
+            ctx.beginPath();
+            
+            ctx.arc(100, 100, 100, 0, Math.PI * 2);
+            
+            ctx.closePath();
+
+            ctx.stroke();
+        }
+        
+    }} 
+/>
+
+`;

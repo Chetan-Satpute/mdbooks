@@ -19,6 +19,9 @@
     "mongodb": "^4.7.0",
     "morgan": "^1.10.0",
     "next-mdx-remote": "^4.0.3",
+    "rehype-katex": "^6.0.2",
+    "rehype-mathjax": "^4.0.2",
+    "remark-math": "^5.1.1",
     "status-code": "file:packages/status-code"
   },
   "devDependencies": {

@@ -1,13 +1,14 @@
 import { Router } from "express";
+import Book from '../DAO/Book.js';
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  res.send("Book Route");
+router.get("/", async (req, res) => {
+  res.send(await Book.getBookTitles());
 });
 
-router.get('/:bookID', (req, res) => {
-  res.send(req.params);
+router.get('/:bookID', async (req, res) => {
+  res.send(await Book.getBookByBookID(req.params.bookID));
 });
 
 export default router;

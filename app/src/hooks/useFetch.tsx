@@ -26,7 +26,7 @@ const useFetch = (getData: getDataFunction, ...args: any[]) => {
     if (loading === true) {
       fetchData(...args);
     }
-  }, [loading]);
+  }, []);
 
   const Loading: FC<ILoadingProps> = ({ spinner, children }) => {
     if (loading) {
