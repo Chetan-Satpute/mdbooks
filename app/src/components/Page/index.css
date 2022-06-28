@@ -1,3 +1,12 @@
 mjx-container[jax="SVG"] > svg {
   display: inline;
 }
+
+.markdown-body ul {
+  @apply list-disc;
+}
+
+.markdown-body ol {
+  @apply list-decimal;
+}
+

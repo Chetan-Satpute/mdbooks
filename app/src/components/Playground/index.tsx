@@ -33,7 +33,7 @@ const Playground: FC<IProps> = ({ data: { pages } }) => {
       clearTimeout(timeoutID);
     }
 
-    setTimeoutID(setTimeout(() => trigger(mdx), 500));
+    setTimeoutID(setTimeout(() => trigger(mdx), 5000));
   }, [mdx]);
 
   return (
